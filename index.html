@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UX/UI: de la investigación al prototipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121316; --bg2:#1a1c21; --bg3:#22252b; --line:#2e3239;
+  --text:#e9eaee; --muted:#a3a9b5;
+  --magenta:#ff3d9a; --teal:#1fd1be; --orange:#ff9147; --graphite:#aab3c2;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+h1,h2,h3{font-family:'Syne',sans-serif;line-height:1.1;letter-spacing:-.01em}
+.mono{font-family:'JetBrains Mono',monospace}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* NAV */
+nav.top{position:sticky;top:0;z-index:20;background:rgba(18,19,22,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.brand{font-family:'Syne',sans-serif;font-weight:800;text-decoration:none;font-size:18px;display:flex;align-items:center;gap:10px}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--magenta);box-shadow:16px 0 0 var(--teal),32px 0 0 var(--orange);margin-right:34px}
+.links{display:flex;gap:4px;flex-wrap:wrap}
+.links a{font-size:14px;text-decoration:none;color:var(--muted);padding:8px 12px;border-radius:8px;transition:.15s}
+.links a:hover{color:var(--text);background:var(--bg3)}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);
+  background:
+   linear-gradient(var(--line) 1px,transparent 1px) 0 0/48px 48px,
+   linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/48px 48px,
+   var(--bg)}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 30%,rgba(255,61,154,.14),transparent 55%),radial-gradient(ellipse at 85% 70%,rgba(31,209,190,.12),transparent 55%);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;padding-top:88px;padding-bottom:72px}
+.kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:22px}
+.hero h1{font-size:clamp(40px,7vw,84px);font-weight:800;max-width:15ch}
+.hero h1 em{font-style:normal;color:var(--magenta)}
+.hero p.lead{max-width:56ch;margin-top:24px;color:var(--muted);font-size:18px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid var(--line);transition:.15s;cursor:pointer;background:none;color:var(--text);font-family:inherit}
+.btn.primary{background:var(--magenta);border-color:var(--magenta);color:#14060d}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn:not(.primary):hover{background:var(--bg3)}
+.stats{display:flex;gap:36px;flex-wrap:wrap;margin-top:54px}
+.stat b{display:block;font-family:'Syne',sans-serif;font-size:34px;font-weight:800}
+.stat span{font-size:13px;color:var(--muted)}
+.track{display:flex;gap:6px;margin-top:44px;flex-wrap:wrap;max-width:640px}
+.track a{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;text-decoration:none;color:#0d0e10;transition:.15s}
+.track a:hover{transform:translateY(-3px)}
+.track-cap{font-size:12.5px;color:var(--muted);margin-top:10px;font-family:'JetBrains Mono',monospace}
+
+/* SECTIONS */
+section.block{padding:84px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:16px;margin-bottom:12px}
+.sec-head .n{font-family:'JetBrains Mono',monospace;color:var(--magenta);font-size:14px}
+.sec-head h2{font-size:clamp(30px,4.5vw,48px);font-weight:800}
+.sec-sub{color:var(--muted);max-width:62ch;margin-bottom:40px}
+
+/* REGLAS */
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
+.rule{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+.rule .ic{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--teal);margin-bottom:10px}
+.rule h3{font-size:19px;margin-bottom:8px}
+.rule p{color:var(--muted);font-size:15px}
+.evalbox{margin-top:28px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:24px}
+.evalbox h3{font-size:20px;margin-bottom:16px}
+.bar{display:flex;height:44px;border-radius:10px;overflow:hidden;gap:3px}
+.bar div{display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#0d0e10;font-weight:500;min-width:0}
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px}
+
+/* CLASES */
+.progress{display:flex;align-items:center;gap:14px;margin-bottom:34px;font-size:14px;color:var(--muted)}
+.progress .pb{flex:1;max-width:320px;height:6px;border-radius:6px;background:var(--bg3);overflow:hidden}
+.progress .pb i{display:block;height:100%;background:var(--teal);transition:width .3s}
+.phase{margin-bottom:38px}
+.phase h3{font-size:22px;display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.phase h3 i{width:12px;height:12px;border-radius:4px;display:inline-block}
+.phase .pd{color:var(--muted);font-size:14.5px;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{position:relative;display:block;text-decoration:none;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;transition:.18s;border-top:3px solid var(--c)}
+.card:hover{background:var(--bg3);transform:translateY(-3px)}
+.card .wk{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--c);display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card h4{font-family:'Syne',sans-serif;font-size:19px;line-height:1.2;margin-bottom:8px}
+.card p{font-size:14px;color:var(--muted)}
+.tag{font-family:'JetBrains Mono',monospace;font-size:11px;padding:2px 8px;border-radius:999px;background:var(--c);color:#0d0e10;font-weight:500}
+.done-mark{color:var(--teal)}
+
+/* REFERENCIAS */
+.refgroup{margin-bottom:30px}
+.refgroup h3{font-size:20px;margin-bottom:14px}
+.refs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.ref{display:block;text-decoration:none;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;transition:.15s}
+.ref:hover{border-color:var(--teal);background:var(--bg3)}
+.ref b{display:flex;justify-content:space-between;font-size:15.5px;margin-bottom:4px}
+.ref b span{color:var(--teal);font-family:'JetBrains Mono',monospace}
+.ref p{font-size:13.5px;color:var(--muted)}
+
+/* BIBLIOGRAFIA */
+.bib{list-style:none;display:grid;gap:0;border-top:1px solid var(--line)}
+.bib li{padding:18px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:6px 24px}
+.bib .t{font-family:'Syne',sans-serif;font-size:19px;font-weight:700}
+.bib .a{color:var(--muted);font-size:14.5px}
+.bib .w{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--orange);align-self:center;text-align:right}
+@media(max-width:640px){.bib li{grid-template-columns:1fr}.bib .w{text-align:left}}
+
+footer{padding:40px 0 60px;color:var(--muted);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+/* VISTA CLASE */
+.crumbs{padding-top:28px;font-size:13.5px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.crumbs a{text-decoration:none}.crumbs a:hover{color:var(--text)}
+.chead{padding:30px 0 40px;border-bottom:1px solid var(--line)}
+.chead .big{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(70px,13vw,150px);line-height:.85;color:var(--c);opacity:.95}
+.chead h1{font-size:clamp(32px,5vw,56px);font-weight:800;margin-top:10px}
+.chead .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{font-family:'JetBrains Mono',monospace;font-size:12px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.pill.c{background:var(--c);border-color:var(--c);color:#0d0e10;font-weight:500}
+.cbody{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;padding:44px 0 30px}
+@media(max-width:900px){.cbody{grid-template-columns:1fr}}
+.cb h2{font-size:15px;font-family:'JetBrains Mono',monospace;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--c);margin:34px 0 12px}
+.cb h2:first-child{margin-top:0}
+.obj{font-size:21px;font-family:'Syne',sans-serif;font-weight:500;line-height:1.35}
+.cb ul{list-style:none;display:grid;gap:10px}
+.cb li{padding:14px 16px 14px 44px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;position:relative;font-size:15.5px}
+.cb li::before{content:"";position:absolute;left:18px;top:21px;width:10px;height:10px;border-radius:3px;background:var(--c)}
+.deliv{background:var(--bg2);border:1px solid var(--c);border-radius:var(--radius);padding:20px;font-size:16px}
+.aside .box{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.aside h3{font-size:16px;margin-bottom:12px}
+.aside .box p{font-size:14.5px;color:var(--muted)}
+.aside .res a{display:flex;justify-content:space-between;gap:10px;text-decoration:none;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.aside .res a:last-child{border-bottom:0}
+.aside .res a:hover{color:var(--teal)}
+.hito{border-color:var(--orange)!important}
+.hito h3{color:var(--orange)}
+.pager{display:flex;justify-content:space-between;gap:14px;padding:30px 0 70px;border-top:1px solid var(--line)}
+.pager a{flex:1;max-width:48%;text-decoration:none;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;transition:.15s}
+.pager a:hover{background:var(--bg3);border-color:var(--c)}
+.pager small{display:block;font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:12px;margin-bottom:4px}
+.pager .nx{text-align:right;margin-left:auto}
+.pager b{font-family:'Syne',sans-serif;font-size:17px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media(max-width:700px){.links a{padding:8px 8px;font-size:13px}.brand i{display:none}.hero .wrap{padding-top:60px}}
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="Inicio del curso"><i></i>UX/UI</a>
+    <div class="links">
+      <a href="#reglas">Reglas</a>
+      <a href="#clases">Clases</a>
+      <a href="#referencias">Referencias</a>
+      <a href="#bibliografia">Bibliografía</a>
+    </div>
+  </div>
+</nav>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">
+    <span>Ingeniería Multimedia · Universidad San Buenaventura · Bogotá</span>
+    <span class="mono">16 semanas · 2 h clase + 4 h trabajo externo</span>
+  </div>
+</footer>
+
+<script>
+/* ============ DATOS (edita aquí el contenido) ============ */
+const PHASES = [
+  {id:'inv', name:'Investigar', range:[1,6],  color:'#ff3d9a', desc:'Entender al usuario y definir el problema correcto antes de diseñar nada.'},
+  {id:'ide', name:'Idear y estructurar', range:[7,9], color:'#ff9147', desc:'Generar soluciones, priorizarlas y organizar cómo se estructura el producto.'},
+  {id:'dis', name:'Diseñar', range:[10,14], color:'#1fd1be', desc:'De wireframes a prototipo de alta fidelidad apoyado en Figma y un sistema de diseño.'},
+  {id:'val', name:'Validar y cerrar', range:[15,16], color:'#aab3c2', desc:'Probar con usuarios, iterar y contar el proceso como case study.'}
+];
+
+const WEEKS = [
+ {n:1, t:'Introducción a UX/UI', obj:'Diferenciar UX, UI, CX y usabilidad, y analizar críticamente un producto digital existente.',
+  clase:['UX vs UI vs CX: qué diseña cada disciplina','El proceso de diseño: doble diamante','Las 10 heurísticas de usabilidad de Nielsen','Demostración de una evaluación heurística'],
+  ext:['Elegir una aplicación digital y evaluarla con las 10 heurísticas','Documentar cada hallazgo con captura, heurística violada y severidad (0–4)','Abrir la bitácora del case study'],
+  ent:'Informe de análisis de la aplicación (3–5 páginas).', cs:'Se abre la bitácora del case study',
+  res:[['NN/g · 10 heurísticas','https://www.nngroup.com/articles/ten-usability-heuristics/'],['Doble diamante (Design Council)','https://www.designcouncil.org.uk/our-resources/the-double-diamond/'],['Laws of UX','https://lawsofux.com/']]},
+ {n:2, t:'Empatía y usuario', obj:'Comprender al usuario más allá de lo que dice y elegir el problema sobre el que trabajará el equipo durante el curso.',
+  clase:['Qué es la empatía en diseño y cómo se practica','Mapa de empatía: dice, piensa, hace, siente','Customer Journey Map: etapas, acciones, emociones y puntos de dolor','Supuestos vs evidencia'],
+  ext:['Conformar equipo y elegir el contexto o problema del proyecto','Elaborar el mapa de empatía','Construir un Journey Map inicial marcando claramente qué son supuestos'],
+  ent:'Mapa de empatía + Journey Map v0 (con supuestos identificados).', cs:'Sección: contexto y problema',
+  res:[['NN/g · Journey mapping 101','https://www.nngroup.com/articles/journey-mapping-101/'],['NN/g · Empathy mapping','https://www.nngroup.com/articles/empathy-mapping/'],['FigJam','https://www.figma.com/figjam/']]},
+ {n:3, t:'Fundamentos de UX Research', obj:'Planificar una investigación con usuarios: qué preguntar, a quién y con qué método.',
+  clase:['Investigación cualitativa vs cuantitativa','Preguntas de investigación y objetivos','Métodos: entrevista, encuesta, observación, diario','Muestreo, ética y consentimiento informado'],
+  ext:['Redactar el plan de investigación: objetivos, preguntas, método y perfil de participantes','Crear el screener y el plan de reclutamiento','Escribir el guion de entrevista y el formato de consentimiento'],
+  ent:'Plan de investigación (con guion, screener y consentimiento).', cs:'Sección: plan de investigación',
+  res:[['NN/g · Qué método de UX research usar','https://www.nngroup.com/articles/which-ux-research-methods/'],['Interaction Design Foundation','https://www.interaction-design.org/']]},
+ {n:4, t:'Entrevistas y encuestas', obj:'Conducir entrevistas que descubran comportamientos reales, evitando sesgos.',
+  clase:['Tipos de preguntas: abiertas, de seguimiento, hipotéticas (y cuáles evitar)','Escucha activa y manejo del silencio','Práctica de entrevista en parejas con retroalimentación','Diseño de encuestas: escalas y sesgos'],
+  ext:['Entrevistar a mínimo 5 usuarios del perfil definido (3 es el mínimo absoluto)','Grabar con consentimiento y transcribir o tomar notas estructuradas','Opcional: lanzar una encuesta breve para complementar'],
+  ent:'Notas o transcripciones + resumen de cada entrevista.', cs:'Transcripciones y notas',
+  res:[['NN/g · Por qué bastan 5 usuarios','https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/'],['Libro: Interviewing Users (Portigal)','#bibliografia']]},
+ {n:5, t:'Análisis de investigación', obj:'Convertir datos crudos en patrones, insights y una persona basada en evidencia.',
+  clase:['Codificación y etiquetado de datos cualitativos','Mapa de afinidad: agrupar, nombrar, priorizar','De dato a insight: la fórmula observación → interpretación → implicación','Personas basadas en evidencia (no en estereotipos)'],
+  ext:['Hacer el mapa de afinidad en FigJam o Miro','Redactar 5–8 insights clave','Crear la Persona y actualizar el Journey Map con datos reales (v1)'],
+  ent:'Mapa de afinidad + Persona + Journey Map v1. Si no alcanza el tiempo, el Journey Map v1 pasa a la semana 6.', cs:'Sección: hallazgos',
+  res:[['NN/g · Affinity diagram','https://www.nngroup.com/articles/affinity-diagram/'],['NN/g · Personas','https://www.nngroup.com/articles/persona/'],['Miro','https://miro.com/']]},
+ {n:6, t:'Definición del problema', hito:'Hito 1 · Investigación y problema', obj:'Formular el problema de diseño con claridad y abrir el espacio de soluciones con preguntas How Might We.',
+  clase:['Problem statement: usuario, necesidad e insight','Point of View y criterios de éxito','How Might We: cómo formularlas ni muy amplias ni muy estrechas','Preparación del Hito 1'],
+  ext:['Redactar el Problem Statement','Escribir entre 5 y 10 preguntas How Might We','Armar y ensayar la presentación del Hito 1'],
+  ent:'Hito 1: presentación del proceso de investigación, Persona, Problem Statement y HMW (con rúbrica).', cs:'Hito 1',
+  res:[['NN/g · How Might We','https://www.nngroup.com/articles/how-might-we-questions/'],['Libro: Just Enough Research (Hall)','#bibliografia']]},
+ {n:7, t:'Ideación y priorización', obj:'Generar muchas ideas, elegir con criterio y delimitar un producto mínimo viable.',
+  clase:['Pensamiento divergente y convergente','Técnicas: Crazy 8s, SCAMPER, brainwriting','Matriz impacto/esfuerzo y MoSCoW','Definir el MVP'],
+  ext:['Generar al menos 20 ideas ligadas a las preguntas HMW','Desarrollar 3 conceptos y compararlos con una matriz','Definir el alcance del MVP: qué entra y qué se deja fuera'],
+  ent:'Documento de ideación con matriz de priorización y alcance del MVP.', cs:'Sección: ideación',
+  res:[['Google Design Sprint Kit','https://designsprintkit.withgoogle.com/'],['Libro: Lean UX (Gothelf y Seiden)','#bibliografia']]},
+ {n:8, t:'Arquitectura de información', obj:'Organizar el contenido y la navegación de modo que los usuarios encuentren lo que buscan.',
+  clase:['Principios: organización, etiquetado, navegación y búsqueda','Sitemap y jerarquías','Card sorting abierto y cerrado','Tree testing (introducción)'],
+  ext:['Construir el sitemap del producto','Realizar un card sorting con mínimo 5 participantes (herramienta digital o presencial)','Ajustar el sitemap según los resultados'],
+  ent:'Sitemap + análisis de resultados del card sorting.', cs:'Sección: arquitectura de información',
+  res:[['NN/g · Card sorting','https://www.nngroup.com/articles/card-sorting-definition/'],['Optimal Workshop','https://www.optimalworkshop.com/'],['Maze','https://maze.co/']]},
+ {n:9, t:'User Flows', obj:'Diseñar los recorridos que seguirá el usuario para cumplir sus tareas, incluidos errores y casos límite.',
+  clase:['Task flow, user flow y wireflow: diferencias','Notación y buenas prácticas de diagramación','Camino feliz, caminos alternos y manejo de errores','Estados vacíos, de carga y de error'],
+  ext:['Diagramar 2–3 flujos principales del MVP','Incluir al menos un camino de error por flujo','Contrastar los flujos con el Journey Map y el sitemap'],
+  ent:'User flows en FigJam (2–3 flujos).', cs:'Sección: flujos de usuario',
+  res:[['FigJam','https://www.figma.com/figjam/'],['Material Design 3 · patrones','https://m3.material.io/']]},
+ {n:10, t:'Wireframes', obj:'Traducir los flujos a pantallas de baja fidelidad y validar la estructura con usuarios antes de invertir en diseño visual.',
+  clase:['Niveles de fidelidad y cuándo usar cada uno','Jerarquía, grillas y patrones de interfaz','Introducción a Figma: frames, formas, texto y herramientas básicas','Prueba rápida de baja fidelidad (papel o prototipo simple)'],
+  ext:['Diseñar en Figma los wireframes de las pantallas clave','Realizar una prueba rápida con 3 usuarios','Documentar hallazgos y primera iteración'],
+  ent:'Wireframes v1 + resumen de la prueba rápida e iteración.', cs:'Primera iteración documentada',
+  res:[['Figma · Learn Design','https://www.figma.com/resources/learn-design/'],['Libro: Designing Interfaces (Tidwell)','#bibliografia']]},
+ {n:11, t:'Fundamentos de UI y accesibilidad', hito:'Hito 2 · Wireframes y dirección visual', obj:'Definir una dirección visual coherente y accesible para el producto.',
+  clase:['Jerarquía visual, espaciado y grillas','Tipografía y escala tipográfica','Color: paletas, roles y contraste','Accesibilidad básica: WCAG, contraste mínimo 4.5:1 y tamaños táctiles'],
+  ext:['Crear el moodboard y el style tile','Definir paleta y tipografías verificando contraste','Preparar la presentación del Hito 2'],
+  ent:'Hito 2: wireframes validados + dirección visual (moodboard, style tile, paleta y tipografía).', cs:'Hito 2',
+  res:[['WCAG 2.2 · Referencia rápida','https://www.w3.org/WAI/WCAG22/quickref/'],['WebAIM · Contrast Checker','https://webaim.org/resources/contrastchecker/'],['Coolors','https://coolors.co/'],['Google Fonts','https://fonts.google.com/']]},
+ {n:12, t:'Figma: componentes y auto layout', obj:'Construir pantallas de forma eficiente y escalable con las herramientas estructurales de Figma.',
+  clase:['Componentes, instancias y variantes','Auto layout y constraints','Estilos y variables (color, tipografía, espaciado)','Organización de archivos, páginas y nomenclatura'],
+  ext:['Construir las pantallas principales usando componentes y auto layout','Definir estilos y variables base','Ordenar el archivo de Figma con nombres claros'],
+  ent:'Archivo de Figma organizado con las pantallas principales.', cs:'Avance de pantallas',
+  res:[['Figma · Learn Design','https://www.figma.com/resources/learn-design/']]},
+ {n:13, t:'Design Systems', obj:'Crear una librería de componentes reutilizable que garantice consistencia en todo el producto.',
+  clase:['Qué es un sistema de diseño y por qué importa','Atomic Design: átomos, moléculas, organismos','Design tokens y documentación','Casos de referencia: Material Design 3 y Apple HIG'],
+  ext:['Construir la librería: botones, campos, tarjetas, navegación y demás componentes','Definir variantes y estados (hover, foco, deshabilitado, error)','Aplicar la librería a las pantallas y documentar su uso'],
+  ent:'Librería de componentes + guía de estilos.', cs:'Sección: sistema de diseño',
+  res:[['Atomic Design (Brad Frost)','https://atomicdesign.bradfrost.com/'],['Material Design 3','https://m3.material.io/'],['Apple HIG','https://developer.apple.com/design/human-interface-guidelines/']]},
+ {n:14, t:'Figma: alta fidelidad y prototipado', hito:'Hito 3 · Prototipo funcional', obj:'Llevar el diseño a alta fidelidad y construir un prototipo interactivo listo para probar con usuarios.',
+  clase:['Alta fidelidad: pulido visual y consistencia','Interacciones, transiciones y Smart Animate','Conectar flujos y casos de error en el prototipo','Preparar el prototipo para pruebas de usabilidad'],
+  ext:['Finalizar las pantallas de alta fidelidad','Prototipar al menos el flujo principal completo','Preparar la presentación del Hito 3'],
+  ent:'Hito 3: prototipo interactivo en Figma con el flujo principal funcionando.', cs:'Hito 3',
+  res:[['Apple HIG','https://developer.apple.com/design/human-interface-guidelines/'],['Material Design 3','https://m3.material.io/']]},
+ {n:15, t:'Pruebas de usabilidad', obj:'Evaluar el prototipo con usuarios reales, priorizar problemas y aplicar mejoras.',
+  clase:['Planificación del test: tareas, escenario y métricas','Moderación y think-aloud','Métricas: éxito, tiempo, errores y escala SUS','Priorizar hallazgos por severidad'],
+  ext:['Realizar pruebas con 5 usuarios','Analizar resultados y priorizar problemas','Iterar el diseño y documentar antes/después'],
+  ent:'Informe de pruebas de usabilidad + versión iterada del prototipo.', cs:'Sección: pruebas y aprendizajes',
+  res:[['NN/g · Usability testing 101','https://www.nngroup.com/articles/usability-testing-101/'],['Maze','https://maze.co/']]},
+ {n:16, t:'Proyecto final', obj:'Presentar el proceso completo como un case study que cuente una historia clara y convincente.',
+  clase:['Estructura de un case study: contexto, proceso, decisiones y resultados','Storytelling y visualización del proceso','Ensayo de presentaciones con retroalimentación'],
+  ext:['Pulir el case study a partir de la bitácora ya construida','Preparar y ensayar la sustentación','Publicar en un portafolio (opcional)'],
+  ent:'Case study final + sustentación.', cs:'Entrega y sustentación',
+  res:[['Behance','https://www.behance.net/']]}
+];
+
+const RULES = [
+ ['01','Metodología semanal','Cada semana combina 2 horas de clase (conceptos, explicación, demostraciones, ejercicios guiados y retroalimentación) con 4 horas de trabajo externo (investigación, aplicación de metodologías y avance del proyecto).'],
+ ['02','Un proyecto continuo','Todo el curso gira alrededor de un mismo problema de diseño. Cada entregable semanal alimenta el siguiente, así que no hay trabajos aislados.'],
+ ['03','Entregables semanales','El entregable de cada semana se sube antes de la siguiente clase, en el formato indicado en la ficha de la clase. Lo que no se entrega a tiempo se retroalimenta con menos profundidad.'],
+ ['04','Bitácora del case study','Cada entregable se documenta como una sección del case study. Así, en la semana 16 solo se pule y se ensaya la presentación.'],
+ ['05','Tres hitos con rúbrica','Semana 6 (investigación y problema), semana 11 (wireframes y dirección visual) y semana 14 (prototipo funcional). Cada hito se presenta y recibe retroalimentación con rúbrica.'],
+ ['06','Trabajo con usuarios','Toda investigación se hace con consentimiento informado y datos anonimizados. Las grabaciones y notas se usan solo para el curso.'],
+ ['07','Integridad y uso de IA','Se puede usar IA como apoyo para explorar o redactar, pero las entrevistas, los hallazgos y las decisiones de diseño deben ser propios. Declara dónde la usaste.'],
+ ['08','Herramientas','Figma y FigJam como base. Se aceptan alternativas para investigación (Miro, Maze, Optimal Workshop) si el resultado es equivalente.']
+];
+
+const EVAL = [
+ ['Entregables semanales',20,'#aab3c2'],
+ ['Hito 1',15,'#ff3d9a'],
+ ['Hito 2',15,'#ff9147'],
+ ['Hito 3',20,'#1fd1be'],
+ ['Case study final',30,'#e9eaee']
+];
+
+const REFS = [
+ {g:'Herramientas', items:[
+  ['Figma','https://www.figma.com/','Diseño de interfaces, componentes y prototipos.'],
+  ['FigJam','https://www.figma.com/figjam/','Mapas, flujos, afinidad y trabajo colaborativo.'],
+  ['Miro','https://miro.com/','Pizarra para síntesis de investigación y workshops.'],
+  ['Maze','https://maze.co/','Pruebas de usabilidad remotas sobre prototipos.'],
+  ['Optimal Workshop','https://www.optimalworkshop.com/','Card sorting y tree testing.']]},
+ {g:'Guías y sistemas de diseño', items:[
+  ['Material Design 3','https://m3.material.io/','Sistema de diseño de Google: componentes y principios.'],
+  ['Apple HIG','https://developer.apple.com/design/human-interface-guidelines/','Guías de interfaz para plataformas Apple.'],
+  ['Atomic Design','https://atomicdesign.bradfrost.com/','Libro en línea sobre sistemas de diseño por niveles.']]},
+ {g:'Accesibilidad, color y tipografía', items:[
+  ['WCAG 2.2 · Referencia rápida','https://www.w3.org/WAI/WCAG22/quickref/','Criterios de accesibilidad filtrables por nivel.'],
+  ['WebAIM Contrast Checker','https://webaim.org/resources/contrastchecker/','Verifica el contraste entre colores.'],
+  ['Coolors','https://coolors.co/','Generador y explorador de paletas.'],
+  ['Google Fonts','https://fonts.google.com/','Tipografías abiertas para web y producto.']]},
+ {g:'Métodos y aprendizaje', items:[
+  ['Nielsen Norman Group','https://www.nngroup.com/articles/','Artículos de referencia sobre UX research y usabilidad.'],
+  ['Laws of UX','https://lawsofux.com/','Principios de psicología aplicados al diseño.'],
+  ['Interaction Design Foundation','https://www.interaction-design.org/','Enciclopedia y cursos de diseño de interacción.'],
+  ['Google Design Sprint Kit','https://designsprintkit.withgoogle.com/','Plantillas y guías para sprints de diseño.']]}
+];
+
+const BIB = [
+ ['Norman, D.','The Design of Everyday Things (ed. revisada)','Basic Books, 2013','Sem. 1–2'],
+ ['Krug, S.','Don\'t Make Me Think, Revisited','New Riders, 2014','Sem. 1, 15'],
+ ['Nielsen, J.','Usability Engineering','Academic Press, 1993','Sem. 1, 15'],
+ ['Garrett, J. J.','The Elements of User Experience (2.ª ed.)','New Riders, 2011','Sem. 1–9'],
+ ['Young, I.','Practical Empathy','Rosenfeld Media, 2015','Sem. 2'],
+ ['Hall, E.','Just Enough Research (2.ª ed.)','A Book Apart, 2019','Sem. 3–6'],
+ ['Portigal, S.','Interviewing Users (2.ª ed.)','Rosenfeld Media, 2023','Sem. 4'],
+ ['Gothelf, J. y Seiden, J.','Lean UX (3.ª ed.)','O\'Reilly, 2021','Sem. 6–7'],
+ ['Rosenfeld, L., Morville, P. y Arango, J.','Information Architecture: For the Web and Beyond (4.ª ed.)','O\'Reilly, 2015','Sem. 8'],
+ ['Cooper, A., Reimann, R., Cronin, D. y Noessel, C.','About Face: The Essentials of Interaction Design (4.ª ed.)','Wiley, 2014','Sem. 9–10'],
+ ['Tidwell, J., Brewer, C. y Valencia, A.','Designing Interfaces (3.ª ed.)','O\'Reilly, 2020','Sem. 10–14'],
+ ['Frost, B.','Atomic Design','Brad Frost, 2016','Sem. 13'],
+ ['Kholmatova, A.','Design Systems','Smashing Magazine, 2017','Sem. 13']
+];
+
+/* ============ UTILIDADES ============ */
+const $app = document.getElementById('app');
+const phaseOf = n => PHASES.find(p => n >= p.range[0] && n <= p.range[1]);
+let done = [];
+try { done = JSON.parse(localStorage.getItem('ux-done') || '[]'); } catch(e) { done = []; }
+function saveDone(){ try { localStorage.setItem('ux-done', JSON.stringify(done)); } catch(e){} }
+const isDone = n => done.includes(n);
+
+/* ============ VISTAS ============ */
+function homeView(){
+  const track = WEEKS.map(w => `<a href="#semana-${w.n}" style="background:${phaseOf(w.n).color}" title="Semana ${w.n}: ${w.t}" aria-label="Semana ${w.n}: ${w.t}">${w.n}</a>`).join('');
+  const rules = RULES.map(r => `<div class="rule"><div class="ic">${r[0]}</div><h3>${r[1]}</h3><p>${r[2]}</p></div>`).join('');
+  const bar = EVAL.map(e => `<div style="width:${e[1]}%;background:${e[2]}">${e[1]}%</div>`).join('');
+  const legend = EVAL.map(e => `<span><i style="background:${e[2]}"></i>${e[0]}</span>`).join('');
+  const phases = PHASES.map(p => {
+    const cards = WEEKS.filter(w => phaseOf(w.n) === p).map(w => `
+      <a class="card" href="#semana-${w.n}" style="--c:${p.color}">
+        <div class="wk"><span>SEMANA ${String(w.n).padStart(2,'0')} ${isDone(w.n)?'<span class="done-mark">✓</span>':''}</span>${w.hito?'<span class="tag">HITO</span>':''}</div>
+        <h4>${w.t}</h4>
+        <p>${w.cs}</p>
+      </a>`).join('');
+    return `<div class="phase"><h3><i style="background:${p.color}"></i>${p.name} <span class="mono" style="font-size:13px;color:var(--muted);font-weight:400">sem. ${p.range[0]}–${p.range[1]}</span></h3><p class="pd">${p.desc}</p><div class="cards">${cards}</div></div>`;
+  }).join('');
+  const refs = REFS.map(g => `<div class="refgroup"><h3>${g.g}</h3><div class="refs">${g.items.map(i => `<a class="ref" href="${i[1]}" target="_blank" rel="noopener"><b>${i[0]}<span>↗</span></b><p>${i[2]}</p></a>`).join('')}</div></div>`).join('');
+  const bib = BIB.map(b => `<li><div><div class="t">${b[1]}</div><div class="a">${b[0]} · ${b[2]}</div></div><div class="w">${b[3]}</div></li>`).join('');
+
+  return `
+  <header class="hero" id="inicio">
+    <div class="wrap">
+      <div class="kicker">Ingeniería Multimedia · Universidad San Buenaventura</div>
+      <h1>UX/UI: de la <em>investigación</em> al prototipo</h1>
+      <p class="lead">Un curso de 16 semanas donde cada clase construye sobre la anterior: entiendes al usuario, defines el problema, diseñas en Figma, pruebas y cuentas todo el proceso como un case study.</p>
+      <div class="cta">
+        <a class="btn primary" href="#semana-1">Empezar con la semana 1 →</a>
+        <a class="btn" href="#clases">Ver todas las clases</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>16</b><span>semanas</span></div>
+        <div class="stat"><b>2 h</b><span>de clase a la semana</span></div>
+        <div class="stat"><b>4 h</b><span>de trabajo externo</span></div>
+        <div class="stat"><b>3</b><span>hitos con rúbrica</span></div>
+      </div>
+      <div class="track" role="navigation" aria-label="Acceso rápido a las semanas">${track}</div>
+      <div class="track-cap">acceso rápido · cada color es una fase del proceso</div>
+    </div>
+  </header>
+
+  <section class="block" id="reglas"><div class="wrap">
+    <div class="sec-head"><span class="n">01</span><h2>Reglas</h2></div>
+    <p class="sec-sub">Cómo funciona el curso, qué se espera de cada semana y cómo se evalúa.</p>
+    <div class="rules">${rules}</div>
+    <div class="evalbox">
+      <h3>Distribución de la evaluación</h3>
+      <div class="bar" role="img" aria-label="Distribución de la evaluación">${bar}</div>
+      <div class="legend">${legend}</div>
+    </div>
+  </div></section>
+
+  <section class="block" id="clases"><div class="wrap">
+    <div class="sec-head"><span class="n">02</span><h2>Clases</h2></div>
+    <p class="sec-sub">Las 16 semanas agrupadas por fase. Entra a cada una para ver el objetivo, lo que se trabaja en clase, el trabajo externo y el entregable.</p>
+    <div class="progress"><span id="pg-text">${done.length} de 16 vistas</span><div class="pb"><i style="width:${done.length/16*100}%"></i></div></div>
+    ${phases}
+  </div></section>
+
+  <section class="block" id="referencias"><div class="wrap">
+    <div class="sec-head"><span class="n">03</span><h2>Referencias prácticas</h2></div>
+    <p class="sec-sub">Herramientas, guías y recursos que usarás durante el curso. Se abren en una pestaña nueva.</p>
+    ${refs}
+  </div></section>
+
+  <section class="block" id="bibliografia" style="border-bottom:0"><div class="wrap">
+    <div class="sec-head"><span class="n">04</span><h2>Bibliografía</h2></div>
+    <p class="sec-sub">Lecturas base del curso, con las semanas en que más se aprovechan.</p>
+    <ul class="bib">${bib}</ul>
+  </div></section>`;
+}
+
+function weekView(n){
+  const w = WEEKS.find(x => x.n === n);
+  if(!w) return homeView();
+  const p = phaseOf(n);
+  const prev = WEEKS.find(x => x.n === n-1), next = WEEKS.find(x => x.n === n+1);
+  const li = a => a.map(i => `<li>${i}</li>`).join('');
+  const res = w.res.map(r => r[1].startsWith('#')
+    ? `<a href="${r[1]}"><span>${r[0]}</span><span class="mono">→</span></a>`
+    : `<a href="${r[1]}" target="_blank" rel="noopener"><span>${r[0]}</span><span class="mono">↗</span></a>`).join('');
+  return `
+  <div style="--c:${p.color}">
+    <div class="wrap">
+      <div class="crumbs"><a href="#inicio">Inicio</a> / <a href="#clases">Clases</a> / Semana ${n}</div>
+      <div class="chead">
+        <div class="big">${String(n).padStart(2,'0')}</div>
+        <h1>${w.t}</h1>
+        <div class="meta">
+          <span class="pill c">${p.name}</span>
+          <span class="pill">2 h clase</span>
+          <span class="pill">4 h trabajo externo</span>
+          ${w.hito?`<span class="pill" style="border-color:var(--orange);color:var(--orange)">${w.hito}</span>`:''}
+        </div>
+      </div>
+      <div class="cbody">
+        <div class="cb">
+          <h2>Objetivo</h2>
+          <p class="obj">${w.obj}</p>
+          <h2>En clase (2 h)</h2>
+          <ul>${li(w.clase)}</ul>
+          <h2>Trabajo externo (4 h)</h2>
+          <ul>${li(w.ext)}</ul>
+          <h2>Entregable</h2>
+          <div class="deliv">${w.ent}</div>
+        </div>
+        <aside class="aside">
+          <div class="box"><h3>Case study</h3><p>${w.cs}</p></div>
+          <div class="box res"><h3>Recursos de la semana</h3>${res}</div>
+          <button class="btn ${isDone(n)?'':'primary'}" id="markbtn" style="width:100%;justify-content:center">${isDone(n)?'✓ Marcada como vista':'Marcar como vista'}</button>
+        </aside>
+      </div>
+      <div class="pager">
+        ${prev?`<a href="#semana-${prev.n}"><small>← SEMANA ${prev.n}</small><b>${prev.t}</b></a>`:'<span></span>'}
+        ${next?`<a class="nx" href="#semana-${next.n}"><small>SEMANA ${next.n} →</small><b>${next.t}</b></a>`:`<a class="nx" href="#inicio"><small>FIN DEL CURSO</small><b>Volver al inicio</b></a>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============ RUTEO POR HASH ============ */
+const HOME_SECTIONS = ['inicio','reglas','clases','referencias','bibliografia'];
+let currentView = null;
+
+function route(){
+  const h = location.hash.slice(1);
+  const m = h.match(/^semana-(\d{1,2})$/);
+  if(m && WEEKS.some(w => w.n === +m[1])){
+    const n = +m[1];
+    $app.innerHTML = weekView(n);
+    currentView = 'semana-' + n;
+    document.title = `Semana ${n} · ${WEEKS[n-1].t} — UX/UI`;
+    window.scrollTo(0,0);
+    wireMark(n);
+    return;
+  }
+  const target = HOME_SECTIONS.includes(h) ? h : 'inicio';
+  if(currentView !== 'home'){
+    $app.innerHTML = homeView();
+    currentView = 'home';
+    document.title = 'UX/UI: de la investigación al prototipo';
+  }
+  const el = document.getElementById(target);
+  if(el && target !== 'inicio') el.scrollIntoView(); else window.scrollTo(0,0);
+}
+function wireMark(n){
+  document.getElementById('markbtn').addEventListener('click', () => {
+    done = isDone(n) ? done.filter(x => x !== n) : [...done, n];
+    saveDone();
+    const y = window.scrollY;
+    $app.innerHTML = weekView(n);
+    window.scrollTo(0, y);
+    wireMark(n);
+  });
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
